@@ -1,0 +1,824 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-5 fade-in-up">
+  <div class="col-lg-6">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb bg-transparent p-0 m-0 small fw-bold text-uppercase">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}"
+            class="text-secondary text-decoration-none">Dashboard</a></li>
+        <li class="breadcrumb-item active text-primary" aria-current="page">{{ quote }}</li>
+      </ol>
+    </nav>
+
+    <h1 class="display-5 fw-bold mb-2">{{ quote }}</h1>
+    <p class="lead text-secondary mb-0">Analysis & 7-Day Model Forecast</p>
+  </div>
+
+  <div class="col-lg-6 d-flex justify-content-lg-end align-items-center mt-4 mt-lg-0 gap-3">
+    <!-- Short Term Badge -->
+    <div
+      class="prediction-badge {% if short_term_decision in ['BUY', 'STRONG BUY'] %}success{% elif short_term_decision in ['SELL', 'STRONG SELL'] %}danger{% else %}warning{% endif %} shadow-sm text-center px-4">
+      <div class="badge-label text-uppercase mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Short Term (7D)
+      </div>
+      <div class="badge-value fs-4">{{ short_term_decision }}</div>
+    </div>
+
+    <!-- Long Term Badge -->
+    <div
+      class="prediction-badge {% if long_term_decision in ['BUY', 'STRONG BUY'] %}success{% elif long_term_decision in ['SELL', 'STRONG SELL'] %}danger{% else %}warning{% endif %} shadow-sm text-center px-4">
+      <div class="badge-label text-uppercase mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Long Term (Trend)
+      </div>
+      <div class="badge-value fs-4">{{ long_term_decision }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-5">
+  <!-- Market Data Card -->
+  <div class="col-lg-7 fade-in-up delay-100">
+    <div class="modern-card h-100">
+      <div class="card-header-modern">
+        <span><i class="fas fa-chart-bar me-2"></i>Quote Overview</span>
+        <span class="badge bg-light text-secondary border">Today</span>
+      </div>
+      <div class="card-body-modern">
+
+        <!-- Row 1: Price & Change -->
+        <div class="d-flex align-items-baseline mb-4">
+          <h1 class="display-4 fw-bold text-dark mb-0 me-3">{{ "₹" if ".NS" in quote or ".BO" in quote else "$" }}{{
+            close_s }}</h1>
+          <div class="fs-5 fw-bold {% if today_data['change'] >= 0 %}text-success{% else %}text-danger{% endif %}">
+            <i class="fas fa-caret-{% if today_data['change'] >= 0 %}up{% else %}down{% endif %} me-1"></i>
+            {{ today_data['change'] }} ({{ today_data['change_pct'] }}%)
+          </div>
+        </div>
+
+        <!-- Row 2: Range Visuals -->
+        <div class="row g-4 mb-4">
+          <!-- Day Range -->
+          <div class="col-12">
+            <div class="d-flex justify-content-between text-secondary small fw-bold mb-1">
+              <span>Day Low: {{ "₹" if ".NS" in quote else "$" }}{{ low_s }}</span>
+              <span>Day High: {{ "₹" if ".NS" in quote else "$" }}{{ high_s }}</span>
+            </div>
+            <div class="progress" style="height: 6px;">
+              <div class="progress-bar bg-dark" role="progressbar"
+                style="width: {{ ((today_data['close'] - today_data['low']) / (today_data['high'] - today_data['low']) * 100)|round(0) if (today_data['high'] - today_data['low']) > 0 else 50 }}%"
+                aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+
+          <!-- 52-Week Range -->
+          <div class="col-12">
+            <div class="d-flex justify-content-between text-secondary small fw-bold mb-1">
+              <span>52W Low: {{ "₹" if ".NS" in quote else "$" }}{{ today_data['year_low'] }}</span>
+              <span>52W High: {{ "₹" if ".NS" in quote else "$" }}{{ today_data['year_high'] }}</span>
+            </div>
+            <div class="progress" style="height: 6px;">
+              <div class="progress-bar bg-primary" role="progressbar"
+                style="width: {{ ((today_data['close'] - today_data['year_low']) / (today_data['year_high'] - today_data['year_low']) * 100)|round(0) if (today_data['year_high'] - today_data['year_low']) > 0 else 50 }}%"
+                aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: Key Stats Grid -->
+        <div class="row g-3 fs-6">
+          <div class="col-6 col-sm-4">
+            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Open</small>
+            <div class="fw-bold text-dark">{{ "₹" if ".NS" in quote else "$" }}{{ open_s }}</div>
+          </div>
+          <div class="col-6 col-sm-4">
+            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Prev Close</small>
+            <div class="fw-bold text-dark">{{ "₹" if ".NS" in quote else "$" }}{{ today_data['prev_close'] }}</div>
+          </div>
+          <div class="col-6 col-sm-4">
+            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Volume</small>
+            <div class="fw-bold text-dark">{{ vol }}</div>
+          </div>
+
+          <div class="col-6 col-sm-4">
+            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">P/E Ratio</small>
+            <div class="fw-bold text-dark">{{ latest_ratios.get('P/E Ratio', '-') }}</div>
+          </div>
+          <div class="col-6 col-sm-4">
+            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Div Yield</small>
+            <div class="fw-bold text-success">{{ latest_ratios.get('Dividend Yield', '-') }}</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Forecast Summary -->
+  <div class="col-lg-5 fade-in-up delay-200">
+    <div class="modern-card h-100 bg-primary text-white border-0"
+      style="background: linear-gradient(135deg, #1e293b, #0f172a);">
+      <div class="card-header-modern bg-transparent text-white border-white border-opacity-10">
+        <span><i class="fas fa-robot me-2"></i>Model Forecasts</span>
+        <small class="opacity-75">Target: Next Close</small>
+      </div>
+      <div class="p-0">
+        <ul class="list-group list-group-flush bg-transparent">
+          <li
+            class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center border-white border-opacity-10 py-3 px-4">
+            <div>
+              <div class="fw-bold">
+                Random Forest
+                {% if best_model == "Random Forest" %}
+                <span class="badge bg-success text-white ms-2" style="font-size: 0.6rem;">MOST ACCURATE</span>
+                {% endif %}
+              </div>
+              <div class="small text-white opacity-50 fst-italic mb-1" style="font-size: 0.75rem;">
+                Pattern Watcher: Uses historical patterns to predict stable outcomes.
+              </div>
+              <small class="opacity-50">RMSE: {{ error_lr }}</small>
+            </div>
+            <div class="text-end">
+              <div class="fs-5 fw-bold">{{ "₹" if ".NS" in quote or ".BO" in quote else "$" }}{{ lr_pred }}</div>
+            </div>
+          </li>
+          <li
+            class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center border-white border-opacity-10 py-3 px-4">
+            <div>
+              <div class="fw-bold">
+                LSTM Neural Net
+                {% if best_model == "LSTM Neural Net" %}
+                <span class="badge bg-success text-white ms-2" style="font-size: 0.6rem;">MOST ACCURATE</span>
+                {% endif %}
+              </div>
+              <div class="small text-white opacity-50 fst-italic mb-1" style="font-size: 0.75rem;">
+                Deep Learning: Analyzes complex non-linear trends.
+              </div>
+              <small class="opacity-50">RMSE: {{ error_lstm }}</small>
+            </div>
+            <div class="text-end">
+              <div class="fs-5 fw-bold">{{ "₹" if ".NS" in quote or ".BO" in quote else "$" }}{{ lstm_pred }}</div>
+            </div>
+          </li>
+          <li
+            class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center border-white border-opacity-10 py-3 px-4">
+            <div>
+              <div class="fw-bold">
+                ARIMA
+                {% if best_model == "ARIMA" %}
+                <span class="badge bg-success text-white ms-2" style="font-size: 0.6rem;">MOST ACCURATE</span>
+                {% endif %}
+              </div>
+              <div class="small text-white opacity-50 fst-italic mb-1" style="font-size: 0.75rem;">
+                Trend Follower: Good for short-term linear momentum.
+              </div>
+              <small class="opacity-50">RMSE: {{ error_arima }}</small>
+            </div>
+            <div class="text-end">
+              <div class="fs-5 fw-bold">{{ "₹" if ".NS" in quote or ".BO" in quote else "$" }}{{ arima_pred }}</div>
+            </div>
+          </li>
+          <li
+            class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center border-white border-opacity-10 py-3 px-4">
+            <div>
+              <div class="fw-bold">
+                Exp. Smoothing
+                {% if best_model == "Exp. Smoothing" %}
+                <span class="badge bg-success text-white ms-2" style="font-size: 0.6rem;">MOST ACCURATE</span>
+                {% endif %}
+              </div>
+              <div class="small text-white opacity-50 fst-italic mb-1" style="font-size: 0.75rem;">
+                Trend Smoother: Averages recent data to find underlying trend.
+              </div>
+              <small class="opacity-50">RMSE: {{ error_ets }}</small>
+            </div>
+            <div class="text-end">
+              <div class="fs-5 fw-bold">{{ "₹" if ".NS" in quote or ".BO" in quote else "$" }}{{ ets_pred }}</div>
+            </div>
+          </li>
+          <li
+            class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center border-0 py-3 px-4">
+            <div>
+              <div class="fw-bold">
+                SARIMA
+                {% if best_model == "SARIMA" %}
+                <span class="badge bg-success text-white ms-2" style="font-size: 0.6rem;">MOST ACCURATE</span>
+                {% endif %}
+              </div>
+              <div class="small text-white opacity-50 fst-italic mb-1" style="font-size: 0.75rem;">
+                Seasonal Trend: Accounts for recurring weekly patterns.
+              </div>
+              <small class="opacity-50">RMSE: {{ error_sarima }}</small>
+            </div>
+            <div class="text-end">
+              <div class="fs-5 fw-bold">{{ "₹" if ".NS" in quote or ".BO" in quote else "$" }}{{ sarima_pred }}</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Technical Analysis Section (StockInvest Style) -->
+<div class="row g-4 mb-5 fade-in-up delay-200">
+  <div class="col-12">
+    <div class="modern-card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="mb-0 fw-bold"><i class="fas fa-microchip me-2 text-primary"></i>Technical Analysis Score</h5>
+        {% if "Golden Star" in tech_signals %}
+        <span class="badge bg-warning text-dark border border-warning">
+          <i class="fas fa-star me-1"></i>GOLDEN STAR SIGNAL
+        </span>
+        {% elif "Death Star" in tech_signals %}
+        <span class="badge bg-danger text-white border border-danger">
+          <i class="fas fa-skull me-1"></i>DEATH STAR SIGNAL
+        </span>
+        {% endif %}
+      </div>
+
+      <div class="row align-items-center">
+        <!-- Score Gauge (Visual) -->
+        <div class="col-md-4 text-center border-end">
+          <div class="position-relative d-inline-block">
+            <div class="display-3 fw-bold 
+               {% if tech_score >= 5 %}text-success
+               {% elif tech_score >= 0 %}text-primary
+               {% elif tech_score >= -5 %}text-warning
+               {% else %}text-danger{% endif %}">
+              {{ tech_score }}
+            </div>
+            <div class="text-uppercase small fw-bold text-secondary">Technical Score (-10 to 10)</div>
+          </div>
+          <div class="mt-3">
+            <span class="badge rounded-pill fw-normal 
+               {% if tech_score >= 2 %}bg-success-subtle text-success
+               {% elif tech_score >= -2 %}bg-warning-subtle text-warning
+               {% else %}bg-danger-subtle text-danger{% endif %}">
+              {% if tech_score >= 2 %}BUY SIGNAL
+              {% elif tech_score <= -2 %}SELL SIGNAL {% else %}NEUTRAL SIGNAL{% endif %} </span>
+          </div>
+          <p class="mt-3 small text-muted text-start px-4">
+            {{ tech_summary }}
+          </p>
+        </div>
+
+        <!-- Indicators Table -->
+        <div class="col-md-8">
+          <div class="table-responsive">
+            <table class="table table-borderless text-center align-middle mb-0">
+              <thead class="text-secondary small text-uppercase">
+                <tr>
+                  <th>RSI (14)</th>
+                  <th>MACD</th>
+                  <th>SMA (50)</th>
+                  <th>SMA (200)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="fs-5 fw-bold 
+                      {% if rsi > 70 %}text-danger
+                      {% elif rsi < 30 %}text-success
+                      {% else %}text-dark{% endif %}">
+                      {{ rsi }}
+                    </div>
+                    <small class="text-muted">
+                      {% if rsi > 70 %}Overbought{% elif rsi < 30 %}Oversold{% else %}Neutral{% endif %} </small>
+                  </td>
+                  <td>
+                    <div class="fs-5 fw-bold {% if macd > 0 %}text-success{% else %}text-danger{% endif %}">
+                      {{ macd }}
+                    </div>
+                    <small class="text-muted"> Momentum</small>
+                  </td>
+                  <td>
+                    <div class="fs-5 fw-bold text-dark">{{ sma50 }}</div>
+                    <small class="text-muted">Short Trend</small>
+                  </td>
+                  <td>
+                    <div class="fs-5 fw-bold text-dark">{{ sma200 }}</div>
+                    <small class="text-muted">Long Trend</small>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Moving Average Context -->
+          <div class="mt-3 p-3 bg-light rounded-3 small text-secondary">
+            <i class="fas fa-info-circle me-1"></i>
+            {% if sma50 > sma200 %}
+            The 50-day SMA is <strong>above</strong> the 200-day SMA, indicating a <span
+              class="text-success fw-bold">BULLISH</span> long-term trend.
+            {% else %}
+            The 50-day SMA is <strong>below</strong> the 200-day SMA, indicating a <span
+              class="text-danger fw-bold">BEARISH</span> long-term trend.
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Section -->
+<h4 class="mb-4 fade-in-up delay-200">Analysis Visualizations</h4>
+<div class="row g-4 mb-5">
+  <div class="col-lg-6 fade-in-up delay-300">
+    <div class="modern-card p-2 text-center">
+      <img src="/static/LR_{{ quote }}.png?t={{ range(1,9999) | random }}" class="img-fluid rounded"
+        alt="Random Forest Plot" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="chart-error-placeholder"
+        style="display: none; min-height: 300px; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8fafc, #f1f5f9); border-radius: 8px;">
+        <i class="fas fa-chart-line text-secondary opacity-50 mb-3" style="font-size: 3rem;"></i>
+        <h6 class="text-secondary fw-bold mb-2">Random Forest Chart Unavailable</h6>
+        <small class="text-muted px-4 text-center">Insufficient data or model error. The prediction is still available
+          above.</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6 fade-in-up delay-300">
+    <div class="modern-card p-2 text-center">
+      <img src="/static/LSTM_{{ quote }}.png?t={{ range(1,9999) | random }}" class="img-fluid rounded" alt="LSTM Plot"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="chart-error-placeholder"
+        style="display: none; min-height: 300px; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8fafc, #f1f5f9); border-radius: 8px;">
+        <i class="fas fa-brain text-secondary opacity-50 mb-3" style="font-size: 3rem;"></i>
+        <h6 class="text-secondary fw-bold mb-2">LSTM Chart Unavailable</h6>
+        <small class="text-muted px-4 text-center">Insufficient training data or neural network error. The prediction is
+          still available above.</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6 fade-in-up delay-300">
+    <div class="modern-card p-2 text-center">
+      <img src="/static/ARIMA_{{ quote }}.png?t={{ range(1,9999) | random }}" class="img-fluid rounded" alt="ARIMA Plot"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="chart-error-placeholder"
+        style="display: none; min-height: 300px; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8fafc, #f1f5f9); border-radius: 8px;">
+        <i class="fas fa-wave-square text-secondary opacity-50 mb-3" style="font-size: 3rem;"></i>
+        <h6 class="text-secondary fw-bold mb-2">ARIMA Chart Unavailable</h6>
+        <small class="text-muted px-4 text-center">Time series modeling error or insufficient historical data. The
+          prediction is still available above.</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6 fade-in-up delay-300">
+    <div class="modern-card p-2 text-center position-relative">
+      <div class="position-absolute top-0 start-0 m-3 z-1">
+        <span class="badge bg-white shadow-sm text-dark border">Score: {{ "%.3f"|format(sentiment) }}</span>
+      </div>
+      <img src="/static/SENTIMENT_{{ quote }}.png?t={{ range(1,9999) | random }}" class="img-fluid rounded"
+        alt="Sentiment Plot"
+        onerror="this.style.display='none'; this.parentElement.querySelector('.chart-error-placeholder').style.display='flex';">
+      <div class="chart-error-placeholder"
+        style="display: none; min-height: 300px; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8fafc, #f1f5f9); border-radius: 8px;">
+        <i class="fas fa-newspaper text-secondary opacity-50 mb-3" style="font-size: 3rem;"></i>
+        <h6 class="text-secondary fw-bold mb-2">Sentiment Chart Unavailable</h6>
+        <small class="text-muted px-4 text-center">No news articles found or sentiment analysis error. The score is
+          shown above.</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6 fade-in-up delay-300">
+    <div class="modern-card p-2 text-center">
+      <img src="/static/ETS_{{ quote }}.png?t={{ range(1,9999) | random }}" class="img-fluid rounded"
+        alt="Exponential Smoothing Plot"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="chart-error-placeholder"
+        style="display: none; min-height: 300px; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8fafc, #f1f5f9); border-radius: 8px;">
+        <i class="fas fa-chart-area text-secondary opacity-50 mb-3" style="font-size: 3rem;"></i>
+        <h6 class="text-secondary fw-bold mb-2">ETS Chart Unavailable</h6>
+        <small class="text-muted px-4 text-center">Exponential smoothing error. The prediction is still available
+          above.</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6 fade-in-up delay-300">
+    <div class="modern-card p-2 text-center">
+      <img src="/static/SARIMA_{{ quote }}.png?t={{ range(1,9999) | random }}" class="img-fluid rounded"
+        alt="SARIMA Plot" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="chart-error-placeholder"
+        style="display: none; min-height: 300px; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8fafc, #f1f5f9); border-radius: 8px;">
+        <i class="fas fa-chart-line text-secondary opacity-50 mb-3" style="font-size: 3rem;"></i>
+        <h6 class="text-secondary fw-bold mb-2">SARIMA Chart Unavailable</h6>
+        <small class="text-muted px-4 text-center">Seasonal ARIMA error. The prediction is still available
+          above.</small>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Forecast and News Row -->
+<div class="row g-4 mb-5">
+  <!-- 7 Day Forecast Table -->
+  <div class="col-lg-4 fade-in-up delay-300">
+    <div class="modern-card h-100">
+      <div class="card-header-modern">
+        <span>7-Day Price Target</span>
+        <div class="small fw-normal text-secondary mt-1" style="font-size: 0.7rem;">
+          Forecast modeled using a <strong>Weighted Smart Consensus</strong>.
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="bg-light">
+            <tr>
+              <th class="ps-4 border-0 text-secondary text-uppercase small">Date</th>
+              <th class="pe-4 text-end border-0 text-secondary text-uppercase small">Target</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for data in forecast_set %}
+            <tr>
+              <td class="ps-4 text-muted">{{ data[0] }}</td>
+              <td class="pe-4 text-end fw-bold text-primary">{{ "₹" if ".NS" in quote or ".BO" in quote else "$" }}{{
+                data[1] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- News Section -->
+  <div class="col-lg-8 fade-in-up delay-300">
+    <div class="modern-card h-100">
+      <div class="card-header-modern">
+        <span>Market News & Sentiment</span>
+      </div>
+      <div class="list-group list-group-flush overflow-auto" style="max-height: 400px;">
+        {% if headlines %}
+        {% for item in headlines %}
+        <a href="{{ item.url }}" target="_blank" class="list-group-item list-group-item-action p-4 border-bottom">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h6 class="mb-0 fw-bold text-dark lh-base">{{ item.title }}</h6>
+            <span
+              class="badge-pill-modern ms-3 text-nowrap {% if item.score > 0.2 %}success{% elif item.score < -0.2 %}danger{% else %}bg-light text-secondary{% endif %}">
+              {{ "%.2f"|format(item.score) }}
+            </span>
+          </div>
+          <div class="d-flex align-items-center text-secondary small">
+            <i class="far fa-newspaper me-2"></i>
+            <span class="me-3">{{ item.source }}</span>
+            <i class="far fa-clock me-2"></i>
+            <span>{{ item.published }}</span>
+          </div>
+        </a>
+        {% endfor %}
+        {% else %}
+        <div class="p-5 text-center text-muted">No recent news available.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fundamentals Section -->
+<div class="mb-5 fade-in-up delay-300">
+  <div class="modern-card">
+    <div class="card-header-modern">
+      <span>Fundamental Ratios</span>
+      <span class="badge bg-light text-secondary border fw-normal">Source: {{fundamentals_source}}</span>
+    </div>
+    <div class="card-body-modern">
+      <div class="row g-3">
+        {% if latest_ratios %}
+        {% for name, val in latest_ratios.items() %}
+        <div class="col-6 col-md-4 col-lg-2">
+          <div class="p-3 rounded bg-light border text-center h-100">
+            <div class="text-secondary text-uppercase fw-bold small mb-2 text-truncate" title="{{name}}">{{name}}</div>
+            <div class="h5 mb-0 fw-bold text-dark">{{val if val is not none else '-'}}</div>
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="col-12 py-3 text-center text-muted">Fundamental data not available for this ticker.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Interactive Charts Section - Compact Layout -->
+<h4 class="mb-4 fade-in-up delay-200">Price Outlook & Model Comparison</h4>
+<div class="row g-3 mb-4">
+  <!-- Price Chart - Compact -->
+  <div class="col-lg-8 fade-in-up delay-300">
+    <div class="modern-card p-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0 fw-bold">60-Day Price History</h6>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetZoom()">Reset</button>
+      </div>
+      <div style="position: relative; height: 220px; width: 100%;">
+        <canvas id="priceChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Model Predictions Bar Chart - Side by side -->
+  <div class="col-lg-4 fade-in-up delay-300">
+    <div class="modern-card p-3 h-100">
+      <h6 class="mb-2 fw-bold">Model Predictions</h6>
+      <div style="position: relative; height: 220px; width: 100%;">
+        <canvas id="predictionChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Model Outlook Table - Compact -->
+<div class="row g-4 mb-4">
+  <div class="col-12 fade-in-up delay-300">
+    <div class="alert alert-soft-primary border-primary border-opacity-25 d-flex align-items-center mb-0 p-3"
+      role="alert">
+      <i class="fas fa-info-circle fs-4 me-3 text-primary"></i>
+      <div>
+        <div class="fw-bold mb-1">Why do models agree or disagree?</div>
+        <div class="small">
+          Different AI models often produce different signals (Buy vs Sell) because they analyze data differently.
+          Use the <strong>"Analysis Score"</strong> and <strong>"Smart Consensus"</strong> for the most reliable
+          aggregated signal.
+        </div>
+      </div>
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
+  <div class="col-12 fade-in-up delay-300">
+    <div class="modern-card">
+      <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0 align-middle">
+          <thead class="bg-light">
+            <tr>
+              <th class="ps-3">Model</th>
+              <th class="text-center">Forecast</th>
+              <th class="text-center">Change</th>
+              <th class="text-center">Signal</th>
+              <th class="text-end pe-3">RMSE</th>
+            </tr>
+          </thead>
+          <tbody id="outlookTable">
+            <!-- Populated by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 7-Day Forecast Chart -->
+<div class="row g-4 mb-5">
+  <div class="col-12 fade-in-up delay-300">
+    <div class="modern-card p-3">
+      <h6 class="mb-2 fw-bold">7-Day Price Forecast (All Models)</h6>
+      <div class="small text-muted mb-3" style="font-size: 0.75rem;">
+        Forecast is for <strong>7 Days</strong> (Short-Term). For Long-Term Safety, check the <strong>Danger
+          Score</strong> above.
+      </div>
+      <div style="position: relative; height: 220px; width: 100%;">
+        <canvas id="forecastChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+
+<script>
+  // Chart data is already JSON-serialized from Python
+  let chartData = {{ chart_data | tojson | safe }};
+  const currencySymbol = "{{ '₹' if '.NS' in quote or '.BO' in quote else '$' }}";
+
+  // FIX: Ensure chartData is an object, even if passed as string
+  if (typeof chartData === 'string') {
+    try {
+      chartData = JSON.parse(chartData);
+    } catch (e) {
+      console.error("Failed to parse chartData string:", e);
+    }
+  }
+
+
+
+  // Only render charts if we have data
+  try {
+    if (chartData && chartData.dates && chartData.dates.length > 0) {
+      // Main Price Chart with predictions
+      const priceCtx = document.getElementById('priceChart').getContext('2d');
+
+      let priceChart = new Chart(priceCtx, {
+        type: 'line',
+        data: {
+          labels: chartData.dates,
+          datasets: [
+            {
+              label: 'Actual Price',
+              data: chartData.actual_prices,
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.3,
+              pointRadius: 1,
+              pointHoverRadius: 5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              position: 'top'
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return context.dataset.label + ': ' + currencySymbol + context.parsed.y.toFixed(2);
+                }
+              }
+            },
+            zoom: {
+              zoom: {
+                wheel: { enabled: true },
+                pinch: { enabled: true },
+                mode: 'xy'
+              },
+              pan: {
+                enabled: true,
+                mode: 'xy'
+              }
+            }
+          },
+          scales: {
+            x: {
+              display: true,
+              title: { display: true, text: 'Date' }
+            },
+            y: {
+              display: true,
+              title: { display: true, text: 'Price (' + currencySymbol + ')' }
+            }
+          }
+        }
+      });
+
+      function resetZoom() {
+        priceChart.resetZoom();
+      }
+
+      // Model Predictions Bar Chart
+      const predCtx = document.getElementById('predictionChart').getContext('2d');
+      const modelNames = Object.values(chartData.models).map(m => m.name);
+      const modelPredictions = Object.values(chartData.models).map(m => m.prediction);
+      const modelColors = Object.values(chartData.models).map(m => m.color);
+
+      new Chart(predCtx, {
+        type: 'bar',
+        data: {
+          labels: modelNames,
+          datasets: [{
+            label: 'Predicted Price',
+            data: modelPredictions,
+            backgroundColor: modelColors.map(c => c + '99'),
+            borderColor: modelColors,
+            borderWidth: 2,
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return currencySymbol + context.parsed.y.toFixed(2);
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              title: { display: true, text: 'Price (' + currencySymbol + ')' }
+            }
+          }
+        }
+      });
+
+      // Populate Outlook Table (includes RMSE in table instead of separate chart)
+      const outlookTable = document.getElementById('outlookTable');
+      const currentPrice = chartData.current_price;
+
+      Object.entries(chartData.models).forEach(([key, model]) => {
+        const change = ((model.prediction - currentPrice) / currentPrice * 100).toFixed(2);
+        const isPositive = change >= 0;
+        const signal = isPositive ? (change > 2 ? 'Strong Buy' : 'Buy') : (change < -2 ? 'Strong Sell' : 'Sell');
+        const signalClass = isPositive ? 'success' : 'danger';
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+      <td class="ps-3 py-2">
+        <span class="d-inline-block rounded-circle me-2" style="width: 10px; height: 10px; background: ${model.color}"></span>
+        <strong>${model.name}</strong>
+      </td>
+      <td class="text-center fw-bold py-2">${currencySymbol}${model.prediction.toFixed(2)}</td>
+      <td class="text-center py-2">
+        <span class="badge bg-${signalClass}-subtle text-${signalClass}">
+          <i class="fas fa-caret-${isPositive ? 'up' : 'down'} me-1"></i>${Math.abs(change)}%
+        </span>
+      </td>
+      <td class="text-center py-2">
+        <span class="badge bg-${signalClass}">${signal}</span>
+      </td>
+      <td class="text-end pe-3 text-muted small py-2">${model.rmse.toFixed(2)}</td>
+    `;
+        outlookTable.appendChild(row);
+      });
+
+      // 7-Day Forecast Chart
+      const forecastCtx = document.getElementById('forecastChart').getContext('2d');
+      const forecastDates = chartData.forecast_dates || ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
+
+      // Create datasets for each model
+      const forecastDatasets = Object.entries(chartData.models).map(([key, model]) => {
+        // Ensure data is array and filtered of nulls (though python sanitizer should handle it)
+        const dataPoints = Array.isArray(model.forecast_7day) ? model.forecast_7day : Array(7).fill(model.prediction);
+        return {
+          label: model.name,
+          data: dataPoints,
+          borderColor: model.color,
+          backgroundColor: model.color + '20',
+          borderWidth: 2,
+          tension: 0.3,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        };
+      });
+
+      new Chart(forecastCtx, {
+        type: 'line',
+        data: {
+          labels: forecastDates,
+          datasets: forecastDatasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: { boxWidth: 12, padding: 15 }
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return context.dataset.label + ': ' + currencySymbol + context.parsed.y.toFixed(2);
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              display: true,
+              title: { display: true, text: 'Date' }
+            },
+            y: {
+              display: true,
+              title: { display: true, text: 'Predicted Price (' + currencySymbol + ')' }
+            }
+          }
+        }
+      });
+
+    } else {
+      console.warn("Chart data is missing or empty.");
+      const msg = '<div class="alert alert-warning m-4"><i class="fas fa-exclamation-triangle me-2"></i>Insufficient historical data to display charts.</div>';
+      document.getElementById('priceChart').parentNode.innerHTML = msg;
+      document.getElementById('predictionChart').parentNode.innerHTML = msg;
+      document.getElementById('forecastChart').parentNode.innerHTML = msg;
+    }
+  } catch (err) {
+    console.error("Chart rendering error:", err);
+    const errMsg = '<div class="alert alert-danger m-4"><i class="fas fa-exclamation-circle me-2"></i>Unable to display charts at this time.</div>';
+    if (document.getElementById('priceChart')) document.getElementById('priceChart').parentNode.innerHTML = errMsg;
+    if (document.getElementById('forecastChart')) document.getElementById('forecastChart').parentNode.innerHTML = errMsg;
+  }
+</script>
+
+{% endblock %}

@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Money Loading Overlay -->
+<div id="money-loading"
+  class="d-none position-fixed top-0 start-0 w-100 h-100 bg-white d-flex flex-column align-items-center justify-content-center"
+  style="z-index: 9999; opacity: 0.95;">
+  <div class="money-animation mb-4" style="font-size: 4rem; color: var(--primary-color);">
+    <i class="fas fa-money-bill-wave fa-bounce"></i>
+    <i class="fas fa-coins fa-spin ms-3" style="--fa-animation-duration: 3s;"></i>
+    <i class="fas fa-chart-line fa-fade ms-3"></i>
+  </div>
+  <h3 class="fw-bold text-dark mb-2">Analyzing Market Data...</h3>
+  <p class="text-muted lead">Printing Money... (Just Kidding, Calculating Predictions)</p>
+</div>
+
+<div class="hero-section text-center rounded-3 mb-5">
+  <div class="container">
+    <h1 class="hero-title display-4 fw-bold">Market Intelligence <br>Redefined</h1>
+    <p class="hero-subtitle mx-auto lead">
+      Advanced AI-powered stock market predictions and sentiment analysis.
+      Get a 7-day outlook for US and Indian markets.
+    </p>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <!-- Tabs Nav -->
+        <ul class="nav nav-pills-modern" id="pills-tab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pills-search-tab" data-bs-toggle="pill" data-bs-target="#pills-search"
+              type="button" role="tab" aria-controls="pills-search" aria-selected="true">
+              <i class="fas fa-search me-2"></i>Single Analysis
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-screener-tab" data-bs-toggle="pill" data-bs-target="#pills-screener"
+              type="button" role="tab" aria-controls="pills-screener" aria-selected="false">
+              <i class="fas fa-list-ul me-2"></i>Batch Screener
+            </button>
+          </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="pills-tabContent">
+
+          <!-- Tab 1: Single Search -->
+          <div class="tab-pane fade show active" id="pills-search" role="tabpanel" aria-labelledby="pills-search-tab"
+            tabindex="0">
+            <div class="modern-card p-4 shadow-lg border-0 bg-white position-relative">
+              <form id="main-search-form" action="{{ url_for('insertintotable') }}" method="POST">
+                <label for="main-ticker-input"
+                  class="form-label d-block text-start text-secondary fw-semibold small mb-2">SEARCH TICKER</label>
+                <div class="input-group input-group-lg">
+                  <span class="input-group-text bg-white border-end-0 text-muted ps-3">
+                    <i class="fas fa-search"></i>
+                  </span>
+                  <input id="main-ticker-input" type="text" name="nm"
+                    class="form-control form-control-modern border-start-0 ps-2"
+                    placeholder="e.g. AAPL, RELIANCE.NS, TSLA" aria-label="Enter Ticker Symbol" required
+                    style="border-left: none;">
+                  <button class="btn btn-primary-modern px-5 rounded-end" type="submit">
+                    Analyze
+                  </button>
+                </div>
+                <div class="form-check form-switch mt-3 d-flex justify-content-center align-items-center gap-2">
+                  <input class="form-check-input" type="checkbox" role="switch" id="auto-ns-checkbox" value="1">
+                  <label class="form-check-label text-muted small user-select-none" for="auto-ns-checkbox">
+                    Auto-append <strong>.NS</strong> for Indian Stocks
+                  </label>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Tab 2: Batch Screener (Moved from sidebar) -->
+          <div class="tab-pane fade" id="pills-screener" role="tabpanel" aria-labelledby="pills-screener-tab"
+            tabindex="0">
+            <div class="modern-card p-4 shadow-lg border-0 bg-white position-relative">
+              <form action="{{ url_for('top_stocks') }}" method="POST">
+                <label for="tickers-input"
+                  class="form-label d-block text-start text-secondary fw-semibold small mb-2">CUSTOM WATCHLIST</label>
+                <div class="input-group input-group-lg">
+                  <span class="input-group-text bg-white border-end-0 text-muted ps-3">
+                    <i class="fas fa-list-ul"></i>
+                  </span>
+                  <input id="tickers-input" type="text" name="tickers"
+                    class="form-control form-control-modern border-start-0 ps-2" placeholder="e.g. MSFT, GOOG, AMZN"
+                    aria-label="Enter Ticker Symbols" required style="border-left: none;">
+                  <button class="btn btn-primary-modern px-5 rounded-end" type="submit">
+                    Run Batch
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Supported Exchanges (Moved from sidebar) -->
+        <div class="mt-4 text-center opacity-75">
+          <small class="text-muted d-block mb-2">Supported Exchanges</small>
+          <div class="d-flex justify-content-center gap-3 text-secondary">
+            <span><i class="fas fa-globe-americas me-1"></i> NYSE/NASDAQ</span>
+            <span class="border-start"></span>
+            <span><i class="fas fa-flag me-1"></i> NSE/BSE</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-5">
+  <!-- Trending Stocks (Centered) -->
+  <div class="col-lg-10 offset-lg-1">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h3 class="mb-0 h4">Trending Now</h3>
+      <div class="d-flex gap-2">
+        {% if last_updated %}
+        <span class="badge bg-white text-secondary border px-3 py-2">
+          <i class="far fa-clock me-1"></i>Updated: {{ last_updated }}
+        </span>
+        {% endif %}
+        <span class="badge bg-light text-secondary rounded-pill border px-3 py-2">
+          <i class="fas fa-bolt text-warning me-1"></i> Live Analysis
+        </span>
+      </div>
+    </div>
+
+    <div class="modern-card border-0 shadow-sm overflow-hidden">
+      <!-- Fast Model Warning -->
+      <div
+        class="alert alert-warning border-0 rounded-0 mb-0 d-flex align-items-center px-4 py-2 bg-warning-subtle text-warning-emphasis"
+        role="alert" style="font-size: 0.9rem;">
+        <i class="fas fa-bolt me-2"></i>
+        <div>
+          <strong>Fast Mode:</strong> Using lightweight model for speed. Analyze ticker above for full accuracy.
+        </div>
+      </div>
+      {% if trending_stocks %}
+      <div class="list-group list-group-flush">
+        {% for stock in trending_stocks %}
+        <a href="{{ 'https://www.nseindia.com/get-quotes/equity?symbol=' + stock.symbol|replace('.NS','') if '.NS' in stock.symbol else '#' }}"
+          target="_blank"
+          class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center justify-content-between hover-bg-light transition-all">
+          <div class="d-flex align-items-center">
+            <div
+              class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3 text-secondary fw-bold"
+              style="width: 48px; height: 48px; font-size: 0.8rem;">
+              {{ stock.symbol[:2] }}
+            </div>
+            <div>
+              <h6 class="mb-0 fw-bold text-dark">{{ stock.name }}</h6>
+              <div class="d-flex align-items-center gap-2 mt-1">
+                <small class="text-muted">{{ stock.symbol }}</small>
+                {% if stock.outlook %}
+                <span class="badge rounded-pill fw-normal
+                    {% if 'Strong Buy' in stock.outlook %}bg-success
+                    {% elif 'Buy' in stock.outlook %}bg-success opacity-75
+                    {% elif 'Sell' in stock.outlook %}bg-danger
+                    {% else %}bg-secondary opacity-75{% endif %}
+                    " style="font-size: 0.7rem;">
+                  {{ stock.outlook }}
+                </span>
+                {% endif %}
+
+                {% if stock.hold_duration and ('Neutral' in stock.outlook or 'Hold' in stock.outlook) %}
+                <span class="badge rounded-pill fw-normal bg-light text-secondary border ml-1"
+                  title="Suggested Hold Duration" style="font-size: 0.7rem;">
+                  <i class="far fa-clock me-1"></i>Hold: {{ stock.hold_duration }}
+                </span>
+                {% endif %}
+
+                {% if stock.rsi %}
+                <span class="badge rounded-pill fw-normal bg-light text-secondary border ml-1"
+                  title="Relative Strength Index (RSI)" style="font-size: 0.7rem;">
+                  RSI: {{ stock.rsi }}
+                </span>
+                {% endif %}
+                {% if stock.macd %}
+                <span class="badge rounded-pill fw-normal bg-light text-secondary border ml-1"
+                  title="Moving Average Convergence Divergence (MACD)" style="font-size: 0.7rem;">
+                  MACD: {{ stock.macd }}
+                </span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="text-end">
+            <div class="fw-bold fs-5">{{ "₹" if ".NS" in stock.symbol else "$" }}{{ "%.2f"|format(stock.price) }}</div>
+            <div class="d-flex align-items-center justify-content-end gap-2">
+              {% if stock.change_pct >= 0 %}
+              <span class="badge-pill-modern bg-success-subtle text-success">
+                <i class="fas fa-arrow-up me-1"></i>{{ "%.1f"|format(stock.change_pct) }}%
+              </span>
+              {% else %}
+              <span class="badge-pill-modern bg-danger-subtle text-danger">
+                <i class="fas fa-arrow-down me-1"></i>{{ "%.1f"|format(stock.change_pct) }}%
+              </span>
+              {% endif %}
+              {% if stock.expected_move is defined %}
+              <span class="badge-pill-modern bg-info-subtle text-info d-none d-sm-inline-block">
+                Exp. Move: {{ "+" if stock.expected_move > 0 else "" }}{{ stock.expected_move }}
+              </span>
+              {% elif stock.get('predicted_price') %}
+              <span class="badge-pill-modern bg-info-subtle text-info d-none d-sm-inline-block">
+                Target: {{ "₹" if ".NS" in stock.symbol else "$" }}{{ "%.2f"|format(stock.predicted_price) }}
+              </span>
+              {% endif %}
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary mb-3" role="status"></div>
+        <p class="text-muted">Analyzing real-time market trends...</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    var form = document.getElementById('main-search-form');
+    var input = document.getElementById('main-ticker-input');
+    var chk = document.getElementById('auto-ns-checkbox');
+
+    if (!form || !input || !chk) return;
+
+    form.addEventListener('submit', function (e) {
+      try {
+        var v = input.value.trim();
+        if (!v) return;
+        // Basic heuristic: if looks like an Indian ticker (letters/numbers) and checkbox checked
+        var plain = /^[A-Za-z0-9_-]+$/.test(v) && v.indexOf('.') === -1 && !v.startsWith('^');
+        if (chk.checked && plain) {
+          input.value = v.toUpperCase() + '.NS';
+        }
+
+        // Show Loading Overlay
+        var loader = document.getElementById('money-loading');
+        if (loader) loader.classList.remove('d-none');
+      } catch (err) {
+        // fail silently
+      }
+    });
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,182 @@
+2025-12-13 19:16:25.267092 - SBIN.NS - EXCEPTION: Keras is not available. Install 'keras' or 'tensorflow' (e.g. pip install tensorflow) to enable LSTM modeling.
+Traceback (most recent call last):
+  File "e:\Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis-master\main.py", line 861, in LSTM_ALGO
+    from keras.callbacks import EarlyStopping, ReduceLROnPlateau
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\_tf_keras\__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\_tf_keras\keras\__init__.py", line 7, in <module>
+    from keras import activations as activations
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\activations\__init__.py", line 7, in <module>
+    from keras.src.activations import deserialize as deserialize
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\__init__.py", line 1, in <module>
+    from keras.src import activations
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\activations\__init__.py", line 3, in <module>
+    from keras.src.activations.activations import celu
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\activations\activations.py", line 1, in <module>
+    from keras.src import backend
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\__init__.py", line 1, in <module>
+    from keras.src.backend.config import backend
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\config.py", line 448, in <module>
+    set_nnx_enabled(_NNX_ENABLED)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\config.py", line 249, in set_nnx_enabled
+    from keras.src.backend.common import global_state
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\common\__init__.py", line 2, in <module>
+    from keras.src.backend.common.dtypes import result_type
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\common\dtypes.py", line 5, in <module>
+    from keras.src.backend.common.variables import standardize_dtype
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\common\variables.py", line 11, in <module>
+    from keras.src.utils.module_utils import tensorflow as tf
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\utils\__init__.py", line 1, in <module>
+    from keras.src.utils.audio_dataset_utils import audio_dataset_from_directory
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\utils\audio_dataset_utils.py", line 4, in <module>
+    from keras.src.utils import dataset_utils
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\utils\dataset_utils.py", line 10, in <module>
+    from keras.src import tree
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\tree\__init__.py", line 1, in <module>
+    from keras.src.tree.tree_api import assert_same_paths
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\tree\tree_api.py", line 13, in <module>
+    from keras.src.tree import optree_impl as tree_impl
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\tree\optree_impl.py", line 13, in <module>
+    from tensorflow.python.trackable.data_structures import ListWrapper
+ModuleNotFoundError: No module named 'tensorflow'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "e:\Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis-master\main.py", line 868, in LSTM_ALGO
+    from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+ModuleNotFoundError: No module named 'tensorflow'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "e:\Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis-master\main.py", line 874, in LSTM_ALGO
+    raise ImportError(
+        "Keras is not available. Install 'keras' or 'tensorflow' (e.g. pip install tensorflow) to enable LSTM modeling."
+    )
+ImportError: Keras is not available. Install 'keras' or 'tensorflow' (e.g. pip install tensorflow) to enable LSTM modeling.
+2025-12-13 19:25:19.558938 - SBIN.NS - EXCEPTION: Keras is not available. Install 'keras' or 'tensorflow' (e.g. pip install tensorflow) to enable LSTM modeling.
+Traceback (most recent call last):
+  File "e:\Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis-master\main.py", line 861, in LSTM_ALGO
+    from keras.callbacks import EarlyStopping, ReduceLROnPlateau
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\_tf_keras\__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\_tf_keras\keras\__init__.py", line 7, in <module>
+    from keras import activations as activations
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\activations\__init__.py", line 7, in <module>
+    from keras.src.activations import deserialize as deserialize
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\__init__.py", line 1, in <module>
+    from keras.src import activations
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\activations\__init__.py", line 3, in <module>
+    from keras.src.activations.activations import celu
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\activations\activations.py", line 1, in <module>
+    from keras.src import backend
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\__init__.py", line 1, in <module>
+    from keras.src.backend.config import backend
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\config.py", line 448, in <module>
+    set_nnx_enabled(_NNX_ENABLED)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\config.py", line 249, in set_nnx_enabled
+    from keras.src.backend.common import global_state
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\common\__init__.py", line 2, in <module>
+    from keras.src.backend.common.dtypes import result_type
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\common\dtypes.py", line 5, in <module>
+    from keras.src.backend.common.variables import standardize_dtype
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\common\variables.py", line 12, in <module>
+    from keras.src.utils.naming import auto_name
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\utils\__init__.py", line 1, in <module>
+    from keras.src.utils.audio_dataset_utils import audio_dataset_from_directory
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\utils\audio_dataset_utils.py", line 4, in <module>
+    from keras.src.utils import dataset_utils
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\utils\dataset_utils.py", line 10, in <module>
+    from keras.src import tree
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\tree\__init__.py", line 1, in <module>
+    from keras.src.tree.tree_api import assert_same_paths
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\tree\tree_api.py", line 13, in <module>
+    from keras.src.tree import optree_impl as tree_impl
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\tree\optree_impl.py", line 13, in <module>
+    from tensorflow.python.trackable.data_structures import ListWrapper
+ModuleNotFoundError: No module named 'tensorflow'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "e:\Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis-master\main.py", line 868, in LSTM_ALGO
+    from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+ModuleNotFoundError: No module named 'tensorflow'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "e:\Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis-master\main.py", line 874, in LSTM_ALGO
+    raise ImportError(
+        "Keras is not available. Install 'keras' or 'tensorflow' (e.g. pip install tensorflow) to enable LSTM modeling."
+    )
+ImportError: Keras is not available. Install 'keras' or 'tensorflow' (e.g. pip install tensorflow) to enable LSTM modeling.
+2025-12-13 19:30:24.283842 - SHAKTIPUMP.NS - EXCEPTION: Keras is not available. Install 'keras' or 'tensorflow' (e.g. pip install tensorflow) to enable LSTM modeling.
+Traceback (most recent call last):
+  File "e:\Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis-master\main.py", line 861, in LSTM_ALGO
+    from keras.callbacks import EarlyStopping, ReduceLROnPlateau
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\_tf_keras\__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\_tf_keras\keras\__init__.py", line 7, in <module>
+    from keras import activations as activations
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\activations\__init__.py", line 7, in <module>
+    from keras.src.activations import deserialize as deserialize
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\__init__.py", line 1, in <module>
+    from keras.src import activations
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\activations\__init__.py", line 3, in <module>
+    from keras.src.activations.activations import celu
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\activations\activations.py", line 1, in <module>
+    from keras.src import backend
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\__init__.py", line 1, in <module>
+    from keras.src.backend.config import backend
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\config.py", line 448, in <module>
+    set_nnx_enabled(_NNX_ENABLED)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\config.py", line 249, in set_nnx_enabled
+    from keras.src.backend.common import global_state
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\common\__init__.py", line 2, in <module>
+    from keras.src.backend.common.dtypes import result_type
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\common\dtypes.py", line 5, in <module>
+    from keras.src.backend.common.variables import standardize_dtype
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\backend\common\variables.py", line 11, in <module>
+    from keras.src.utils.module_utils import tensorflow as tf
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\utils\__init__.py", line 1, in <module>
+    from keras.src.utils.audio_dataset_utils import audio_dataset_from_directory
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\utils\audio_dataset_utils.py", line 4, in <module>
+    from keras.src.utils import dataset_utils
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\utils\dataset_utils.py", line 10, in <module>
+    from keras.src import tree
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\tree\__init__.py", line 1, in <module>
+    from keras.src.tree.tree_api import assert_same_paths
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\tree\tree_api.py", line 13, in <module>
+    from keras.src.tree import optree_impl as tree_impl
+  File "C:\Users\khusb\AppData\Local\Programs\Python\Python314\Lib\site-packages\keras\src\tree\optree_impl.py", line 13, in <module>
+    from tensorflow.python.trackable.data_structures import ListWrapper
+ModuleNotFoundError: No module named 'tensorflow'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "e:\Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis-master\main.py", line 868, in LSTM_ALGO
+    from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+ModuleNotFoundError: No module named 'tensorflow'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "e:\Stock-Market-Prediction-Web-App-using-Machine-Learning-And-Sentiment-Analysis-master\main.py", line 874, in LSTM_ALGO
+    raise ImportError(
+        "Keras is not available. Install 'keras' or 'tensorflow' (e.g. pip install tensorflow) to enable LSTM modeling."
+    )
+ImportError: Keras is not available. Install 'keras' or 'tensorflow' (e.g. pip install tensorflow) to enable LSTM modeling.
+2025-12-20 15:31:43.717965 - LENSKART.NS: Insufficient data: 11 rows
+2025-12-20 15:34:44.094532 - LENSKART.NS: Insufficient data: 11 rows

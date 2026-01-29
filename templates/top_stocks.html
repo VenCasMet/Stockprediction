@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row align-items-end mb-4 fade-in-up">
+  <div class="col-lg-8">
+    <nav aria-label="breadcrumb" class="mb-2">
+      <ol class="breadcrumb bg-transparent p-0 m-0 small fw-bold text-uppercase">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}"
+            class="text-secondary text-decoration-none">Dashboard</a></li>
+        <li class="breadcrumb-item active text-primary" aria-current="page">Top Picks</li>
+      </ol>
+    </nav>
+    <h1 class="display-6 fw-bold mb-0">Daily Top Opportunities</h1>
+  </div>
+  <div class="col-lg-4 text-lg-end">
+    <span class="text-secondary small">
+      <i class="far fa-clock me-1"></i> Updated: {{ now() if now is defined else 'Just now' }}
+    </span>
+  </div>
+</div>
+
+<div
+  class="alert alert-warning border border-warning bg-warning bg-opacity-10 rounded-3 mb-4 d-flex align-items-center fade-in-up delay-100"
+  role="alert">
+  <i class="fas fa-exclamation-triangle me-3 fs-5"></i>
+  <div>
+    <strong>Analyst Note:</strong> These are AI-generated predictions based on technical momentum. Always conduct your
+    own due diligence.
+  </div>
+</div>
+
+{% if not top_stocks and not target_tickers %}
+<div class="modern-card p-5 text-center fade-in-up delay-200">
+  <div class="mb-3 text-secondary opacity-50">
+    <i class="fas fa-search fa-3x"></i>
+  </div>
+  <h4 class="mb-2">No High-Confidence Signals Found</h4>
+  <p class="text-secondary mb-4">Our algorithms haven't found any stock crossing the momentum threshold in the current
+    screener list.</p>
+  <a href="{{ url_for('index') }}" class="btn btn-primary-modern">Back to Dashboard</a>
+</div>
+{% else %}
+<div class="modern-card fade-in-up delay-200">
+  <div class="card-header-modern">
+    <span><i class="fas fa-list-ol me-2"></i>Screener Results</span>
+    <span id="match-count" class="badge bg-success-subtle text-success border border-success-subtle">
+      0 Matches
+    </span>
+  </div>
+  <!-- Batch Screener Animation -->
+  <!-- Batch Screener Animation -->
+  <div id="batch-analyzing" class="py-5 text-center" style="display:none;">
+    <div class="d-flex flex-column align-items-center justify-content-center gap-3 fade-in">
+      <div class="position-relative">
+        <i class="fas fa-circle-notch fa-spin fa-3x text-primary"></i>
+        <i class="fas fa-bolt position-absolute top-50 start-50 translate-middle text-primary"
+          style="font-size: 1rem;"></i>
+      </div>
+      <span class="fw-bold fs-4 text-dark" id="analyzing-text">Preparing Analysis...</span>
+      <p class="text-muted small mb-0">AI is processing market nodes in real-time</p>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="bg-light">
+        <tr>
+          <th class="ps-4 py-3 border-0 text-secondary text-uppercase small fw-bold">#</th>
+          <th class="py-3 border-0 text-secondary text-uppercase small fw-bold">Symbol</th>
+          <th class="py-3 border-0 text-secondary text-uppercase small fw-bold">Price</th>
+          <th class="py-3 border-0 text-secondary text-uppercase small fw-bold">Forecast</th>
+          <th class="py-3 border-0 text-secondary text-uppercase small fw-bold">Potential</th>
+          <th class="py-3 border-0 text-secondary text-uppercase small fw-bold">Sentiment</th>
+          <th class="pe-4 py-3 border-0 text-secondary text-uppercase small fw-bold text-end">Verdict</th>
+        </tr>
+      </thead>
+      <tbody id="results-body">
+        <!-- Rows will be added here via JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/main.js"></script>
+<script>
+  const TARGET_TICKERS = {{ target_tickers| tojson if target_tickers else "[]" }};
+
+  if (TARGET_TICKERS.length > 0) {
+    document.getElementById('batch-analyzing').style.display = 'block';
+    processBatch(TARGET_TICKERS);
+  } else {
+    // If no tickers, show the 'No results' card logic if needed, 
+    // but usually the backend provides defaults if empty.
+  }
+
+  async function processBatch(tickers) {
+    const tbody = document.getElementById('results-body');
+    const analyzingText = document.getElementById('analyzing-text');
+    const matchCountBadge = document.getElementById('match-count');
+    let matches = 0;
+    let count = 0;
+
+    for (const ticker of tickers) {
+      analyzingText.textContent = `Analyzing ${ticker}...`;
+
+      try {
+        const response = await fetch('/api/analyze_stock', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ ticker: ticker })
+        });
+
+        const data = await response.json();
+
+        if (!data.error && data.stock) {
+          const stock = data.stock;
+          matches++;
+          count++;
+
+          // Create Row
+          const tr = document.createElement('tr');
+          tr.className = "fade-in-up";
+
+          // Determine currency
+          const isIndian = stock.quote.includes('.NS') || stock.quote.includes('.BO');
+          const curr = isIndian ? '₹' : '$';
+
+          // Format numbers
+          const closePrice = parseFloat(stock.today_data.close || 0).toFixed(2);
+          const predPrice = parseFloat(stock.lr_pred || 0).toFixed(2);
+          const errorLr = parseFloat(stock.error_lr || 0).toFixed(2);
+          const gainPct = parseFloat(stock.potential_gain_pct || 0).toFixed(2);
+          const sentiment = parseFloat(stock.sentiment || 0).toFixed(3);
+
+          // Gain Badge
+          let gainBadge = '';
+          if (stock.potential_gain_pct >= 0) {
+            gainBadge = `<span class="badge bg-success-subtle text-success"><i class="fas fa-caret-up me-1"></i>${gainPct}%</span>`;
+          } else {
+            gainBadge = `<span class="badge bg-danger-subtle text-danger"><i class="fas fa-caret-down me-1"></i>${gainPct}%</span>`;
+          }
+
+          // Decision Badge
+          let decisionClass = 'bg-secondary text-white';
+          if (stock.decision === 'BUY') decisionClass = 'success';
+          else if (stock.decision === 'HOLD') decisionClass = 'warning';
+
+          tr.innerHTML = `
+                      <td class="ps-4 fw-bold text-secondary text-opacity-50">${count}</td>
+                      <td>
+                          <span class="fw-bold text-primary">${stock.quote}</span>
+                      </td>
+                      <td class="font-monospace">${curr}${closePrice}</td>
+                      <td class="font-monospace text-muted">
+                          <div>${curr}${predPrice}</div>
+                          <div class="small fw-normal text-secondary opacity-75" title="Root Mean Squared Error">±${errorLr}</div>
+                      </td>
+                      <td>${gainBadge}</td>
+                      <td><span class="fw-medium text-secondary">${sentiment}</span></td>
+                      <td class="pe-4 text-end">
+                          <span class="badge-pill-modern ${decisionClass}">${stock.decision}</span>
+                      </td>
+                  `;
+
+          tbody.appendChild(tr);
+          matchCountBadge.textContent = `${matches} Matches`;
+        } else {
+          console.warn(`Skipped ${ticker}: ${data.message}`);
+        }
+      } catch (e) {
+        console.error(`Error processing ${ticker}:`, e);
+      }
+    }
+
+    analyzingText.textContent = "Analysis Complete";
+    setTimeout(() => {
+      document.getElementById('batch-analyzing').style.display = 'none';
+    }, 2000);
+  }
+</script>
+{% endblock %}
