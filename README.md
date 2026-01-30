@@ -121,3 +121,9 @@ This hybrid approach provides context-aware predictions instead of relying solel
 📈 ARIMA Price Forecast vs Actual<img width="1394" height="405" alt="image" src="https://github.com/user-attachments/assets/793c5d7a-8590-4b87-980f-b9784a13396e" />
 🤖 Multi-Model Forecast Comparison<img width="1413" height="349" alt="image" src="https://github.com/user-attachments/assets/539e78a3-f7fd-408b-a26a-46d4c5fdf3dc" />
 📉 Technical Indicators Dashboard<img width="1218" height="594" alt="image" src="https://github.com/user-attachments/assets/33a7a11d-4037-4427-90f4-a7f89c6bb90f" />
+
+▶️ Run the Application
+
+After completing the setup and installing dependencies, start the application using: python main.py
+
+Once running, open your browser and access the dashboard (if enabled) to view stock forecasts, sentiment analysis, and model insights.
