@@ -23,43 +23,43 @@ By correlating sentiment scores with price movement, the model attempts to valid
 
 🛠️ Tech Stack
 
-Technology--------------Purpose
+        Technology--------------Purpose
 
-Python------------------Core logic and modeling
+        Python------------------Core logic and modeling
 
-Yahoo Finance Dataset---Historical stock prices
+        Yahoo Finance Dataset---Historical stock prices
 
-News API----------------Real-time financial news extraction
+        News API----------------Real-time financial news extraction
 
-VADER (NLTK)------------Sentiment analysis of news headlines
+        VADER (NLTK)------------Sentiment analysis of news headlines
 
-Pandas / NumPy----------Data processing
+        Pandas / NumPy----------Data processing
 
-Flask (if applicable)---Web interface
+        Flask (if applicable)---Web interface
 
-HTML / CSS / JS---------Frontend visualization
+        HTML / CSS / JS---------Frontend visualization
 
 📦 Repository Structure
 
 📦 Stockprediction
 
-├── static/---------------------# CSS, JS, assets
+        ├── static/---------------------# CSS, JS, assets
 
-├── templates/------------------# HTML templates
+        ├── templates/------------------# HTML templates
 
-├── constants.py----------------# API keys & configuration
+        ├── constants.py----------------# API keys & configuration
+        
+        ├── main.py---------------------# Core prediction pipeline
 
-├── main.py---------------------# Core prediction pipeline
+        ├── update_nse_trends.py--------# Stock & trend updates
 
-├── update_nse_trends.py--------# Stock & trend updates
+        ├── requirements.txt------------# Dependencies
 
-├── requirements.txt------------# Dependencies
+        ├── Procfile--------------------# Deployment configuration
 
-├── Procfile--------------------# Deployment configuration
+        ├── Yahoo-Finance-Ticker-Symbols.csv
 
-├── Yahoo-Finance-Ticker-Symbols.csv
-
-└── logs / outputs--------------# Prediction & sentiment logs
+        └── logs / outputs--------------# Prediction & sentiment logs
 
 ⚙️ How It Works
 
@@ -123,7 +123,24 @@ This hybrid approach provides context-aware predictions instead of relying solel
 📉 Technical Indicators Dashboard<img width="1218" height="594" alt="image" src="https://github.com/user-attachments/assets/33a7a11d-4037-4427-90f4-a7f89c6bb90f" />
 
 ▶️ Run the Application
+ 1) Clone the Repo
+    
+        git clone https://github.com/VenCasMet/Stockprediction.git
+    
+        cd Stockprediction
+    
+2) Create & Activate Virtual Environment
+   
+        python3 -m venv venv
+        source venv/bin/activate      # macOS/Linux
+        venv\Scripts\activate         # Windows
 
-After completing the setup and installing dependencies, start the application using: python main.py
+3) Install Dependencies
+
+        pip install -r requirements.txt
+
+After completing the setup and installing dependencies, start the application using: 
+
+        python main.py
 
 Once running, open your browser and access the dashboard (if enabled) to view stock forecasts, sentiment analysis, and model insights.
